@@ -1,0 +1,13 @@
+#!/bin/bash
+
+
+
+read -p "输入需要创建的文件名：" file
+
+touch $file
+
+if [ $? -ne 0 ];then
+        echo "文件创建错误"
+else
+        echo "成功创建 $file 文件"
+fi
