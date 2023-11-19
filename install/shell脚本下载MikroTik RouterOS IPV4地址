@@ -1,0 +1,9 @@
+#!/bin/bash
+wget http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest
+echo "/ip firewall address-list" > "address-list_$(date +'%Y%m%d').rsc"
+grep "|CN|ipv4" delegated-apnic-latest | \
+awk -F'|' '{print "add address="$4"/"32-int(log($5)/log(2))" disabled=no list=zh-ip"}' \
+>> "address-list_$(date +'%Y%m%d').rsc"
+
+
+rm delegated-apnic-latest
