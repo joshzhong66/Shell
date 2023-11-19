@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#获取当前日期，并将其格式化为 "年-月-日" 的形式，保存在变量 date 中
+date=$(date +"%Y-%m-%d")
+
+#源文件（需要备份的文件）所在的目录路径
+homedir=/data/gok_res
+
+#备份文件存储的根目录路径
+bakdir=/data/backup/gok_res
+
+#创建一个子目录，用于存储今天的备份文件。
+backupdir="$bakdir/$date"
+
+#创建备份目录。-p 选项确保如果目录已经存在，不会报错
+mkdir -p "$backupdir"
+
+# 备份文件，使用 tar 命令将源目录压缩成一个以当前日期命名的 tar.gz 文件，然后存储在备份目录
+tar -zcvf "$backupdir/gok_res_$date.tar.gz" "$homedir"
+
+#使用 find 命令查找备份根目录下文件名匹配 "gok_res*.tar.gz"，且最后修改时间超过30天的文件，
+#然后通过 -exec 选项结合 rm 命令删除这些文件
+find "$bakdir" -name "gok_res*.tar.gz" -mtime +30 -exec rm -f {} \;
