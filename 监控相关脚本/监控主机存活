@@ -1,0 +1,12 @@
+#!/bin/bash
+
+for ((;;))
+   do
+        ping -c2 $1 &>/dev/null
+        if [ $? -eq 0 ];then
+                echo -e "`date +%F-%H-%M-%S` is \033[032m up \033[0m"
+        else
+                echo -e "`date +%F-%H-%M-%S` is \033[031m down \033[0m"
+        fi
+        sleep 5
+done
