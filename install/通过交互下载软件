@@ -1,0 +1,67 @@
+#通过交互下载软件
+#执行脚本，输入url，指定路径，例如：sh 12_2.sh https://im.qq.com/pcqq /tmp/1122
+
+#脚本内容：
+
+#!/bin/bash
+#author:josh
+#version:v1
+#date:2023/11/22
+
+
+
+#检查参数数量
+if [ "$#" -ne 2 ];then
+        #使用双引号以确保特殊字符被正确处理。
+        #$1 是脚本的第一个参数，通常是 URL。
+        #$2 是脚本的第二个参数，通常是目录。
+        echo "Usage：$0 <URL> <目录>"
+        exit 1
+fi
+
+#检查weget命令是否存在
+if !which wget &> /dev/null;then
+        echo "Error:wget命令未安装，"
+        yum -y install wget
+fi
+
+
+while true
+do
+        if [ -d "$2" ];then
+                #目录存在
+                cd "$2"
+
+                #检查文件是否存在
+                if [ -e "$(basename $1)" ];then
+                        echo "文件已存在于目录中，退出脚本。"
+                        exit 0
+                fi
+
+                break
+        else
+
+                read -p "目录不存在，是否要创建目录？（输入y或者n）" yn
+                case $yn in
+                        y|Y)
+                                mkdir -p "$2"
+                                ;;
+                        n|N)
+                                exit 2
+                                ;;
+                        *)
+                                echo "你只能输入y或者n"
+                                continue
+                                ;;
+                esac
+        fi
+done
+
+#下载文件
+if wget "$1";then
+        echo "下载成功"
+        exit 0
+else
+        echo "下载失败"
+        exit 1
+fi
