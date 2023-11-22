@@ -1,0 +1,24 @@
+#从2023-08-17到今天过去多少天
+
+#脚本如下：
+  
+#!/bin/bash
+
+#指定目标日期
+
+target_date="2023-08-17"
+
+#获取今天的日期
+
+current_date=$(date +"%Y-%m-%d")
+
+#将日期转换为Unix时间戳（秒数）
+
+target_timestamp=$(date -d "$target_date" +"%s")
+current_timestamp=$(date -d "$current_date" +"%s")
+
+#计算过去的天数
+
+days_passed=$(( (current_timestamp - target_timestamp) / 86400 ))
+
+echo "从 $target_date 到 $current_date 已经过去了 $days_passed 天。"
