@@ -1,0 +1,93 @@
+#脚本1：创建用户存入userinfo.txt
+
+#!/bin/bash
+#auther:josh
+#version:v1
+#date:2023-11-20
+
+#查看userinfo文件是否存在
+if [ -f /tmp/userinfo.txt ]
+then
+        rm -f /tmp/userinfo.txt
+fi
+
+
+#判断mkpasswd命令是否存在，用该命令来生成随机字符串，密码
+if ! which mkpasswd
+then
+        yum install -y expect
+fi
+
+
+#借助seq生成00-09，10个数的队列
+for i in `seq -w 0 09`
+do
+        p=`mkpasswd -l 15 -s 0`
+        useradd user_${i} && echo "${p}" | passwd --stdin user_${i}
+        echo "user${i} ${p}" >>/tmp/userinfo.txt
+done
+
+
+
+
+
+
+
+
+#脚本2：验证这些用户是否可以登录
+
+#!/bin/bash
+#author: josh
+#version: v1
+#date: 2023-11-20
+
+if ! which expect; then
+    yum install -y expect
+fi
+
+for i in $(seq -w 00 09); do
+    username="user_${i}"
+    password=$(awk -v u="$username" '$1 == u {print $2}' /tmp/userinfo.txt)
+
+    # 使用 expect 进行密码认证
+    expect -c "
+        set timeout 10
+        spawn ssh -o StrictHostKeyChecking=no $username@localhost
+        expect \"password:\"
+        send \"$password\r\"
+        expect eof
+    "
+    
+    status=$?
+
+    if [ $status -eq 0 ]; then
+        echo "SSH登录测试成功: $username"
+    else
+        echo "SSH登录测试失败: $username"
+    fi
+done
+
+
+
+
+
+
+
+#脚本3：删除这些用户
+#!/bin/bash
+
+#删除用户和主目录
+for i in {00..09};do
+        username="user_$i"
+
+        #检查用户是否存在
+        if id "$username" &>/dev/null;then
+                #删除用户
+                userdel -r "$username"
+                echo "用户 $username 已删除"
+        else
+                echo "用户 $username 不存在"
+        fi
+done
+
+echo "操作完成"
